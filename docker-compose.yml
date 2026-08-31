@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: visionkled
+      POSTGRES_PASSWORD: visionkled
+      POSTGRES_DB: visionkled
+    ports:
+      - "5435:5432"
+    volumes:
+      - visionkled_pg:/var/lib/postgresql/data
+
+volumes:
+  visionkled_pg:

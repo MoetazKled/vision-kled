@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{NAME}} — Portfolio</title>
+  <style>
+    :root { --ink:#1c1917; --muted:#57534e; --paper:#f6f1e8; --line:#e4d9c8; --accent:#1f4d3a; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Georgia, "Times New Roman", serif; background: var(--paper); color: var(--ink); }
+    header { padding: 88px 24px 48px; max-width: 780px; margin: 0 auto; }
+    .kicker { font-family: system-ui, sans-serif; letter-spacing: .18em; text-transform: uppercase; font-size: 11px; color: var(--muted); }
+    h1 { font-size: clamp(40px, 7vw, 72px); margin: 14px 0 10px; font-weight: 500; letter-spacing: -0.03em; }
+    h2 { font-size: 22px; font-weight: 400; color: var(--muted); margin: 0; }
+    main { max-width: 780px; margin: 0 auto; padding: 0 24px 96px; }
+    section { border-top: 1px solid var(--line); padding: 36px 0; }
+    h3 { font-family: system-ui, sans-serif; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; margin: 0 0 14px; }
+    p { line-height: 1.7; font-size: 18px; margin: 0; }
+    .meta { display:flex; gap: 24px; flex-wrap:wrap; font-family: system-ui, sans-serif; font-size: 14px; }
+    a { color: var(--accent); }
+    footer { font-family: system-ui, sans-serif; font-size: 12px; color: var(--muted); padding-top: 28px; }
+    .badge { display:inline-block; border:1px solid var(--line); padding: 4px 10px; font-family: system-ui, sans-serif; font-size: 11px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="kicker">Draft portfolio · Vision Kled</div>
+    <h1>{{NAME}}</h1>
+    <h2>{{HEADLINE}}</h2>
+  </header>
+  <main>
+    <section>
+      <h3>About</h3>
+      <p>{{ABOUT}}</p>
+    </section>
+    <section>
+      <h3>Now looking</h3>
+      <p>Open to roles and collaborations that match this background. This page is a working draft prepared so you can request changes before it goes live.</p>
+    </section>
+    <section>
+      <h3>Contact</h3>
+      <div class="meta">
+        <span>{{PHONE}}</span>
+        <span>{{CITY}}</span>
+      </div>
+    </section>
+    <footer>Prepared by {{BRAND}} — demo only, not yet published.</footer>
+  </main>
+</body>
+</html>

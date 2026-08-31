@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{NAME}} — {{BUSINESS}}</title>
+  <style>
+    :root { --ink:#1a1a1a; --muted:#5c5852; --paper:#fffdf8; --line:#ece6dc; --accent:#8b3a2a; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: "Noto Naskh Arabic", "Amiri", Georgia, serif; background: var(--paper); color: var(--ink); }
+    .hero { padding: 88px 24px 52px; text-align: center; }
+    .kicker { font-family: system-ui, sans-serif; font-size: 12px; letter-spacing: .18em; color: var(--muted); }
+    h1 { font-size: clamp(32px, 6vw, 56px); margin: 10px 0 6px; }
+    .tag { font-size: 20px; color: var(--muted); }
+    main { max-width: 720px; margin: 0 auto; padding: 0 24px 96px; }
+    section { border-top: 1px solid var(--line); padding: 32px 0; }
+    h2 { font-family: system-ui, sans-serif; font-size: 13px; margin: 0 0 12px; }
+    p, li { font-size: 18px; line-height: 1.8; }
+    .cta { display: inline-block; margin-top: 10px; padding: 10px 18px; border: 1px solid var(--ink); text-decoration: none; color: var(--ink); }
+    footer { font-family: system-ui, sans-serif; font-size: 12px; color: var(--muted); }
+    ul { padding: 0; margin: 0; list-style: none; }
+    li + li { margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <div class="kicker">نسخة تجريبية</div>
+    <h1>{{NAME}}</h1>
+    <div class="tag">{{BUSINESS}} · {{CITY}}</div>
+  </div>
+  <main>
+    <section>
+      <h2>من نحن</h2>
+      <p>{{ABOUT}}</p>
+    </section>
+    <section>
+      <h2>خدمات</h2>
+      <ul>
+        <li>استقبال مباشر واستشارة أولى</li>
+        <li>خدمة واضحة بأسعار معقولة</li>
+        <li>تواصل سريع عبر الهاتف</li>
+      </ul>
+    </section>
+    <section>
+      <h2>تواصل</h2>
+      <p>{{PHONE}}</p>
+      <a class="cta" href="tel:{{PHONE}}">اتصل الآن</a>
+    </section>
+    <footer>أُعدّ بواسطة {{BRAND}} — ديمو فقط، الموقع غير منشور بعد.</footer>
+  </main>
+</body>
+</html>
