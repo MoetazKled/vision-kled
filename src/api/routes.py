@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from src.database import get_db
@@ -61,7 +62,12 @@ def list_products() -> list[dict[str, str]]:
 
 @router.get("/leads")
 def list_leads(db: Session = Depends(get_db)) -> list[dict]:
-    rows = db.query(Lead).order_by(Lead.id.desc()).all()
+    rows = (
+        db.query(Lead)
+        .filter(or_(Lead.name != "", Lead.phone.notin_(["", "+216"])))
+        .order_by(Lead.id.desc())
+        .all()
+    )
     return [lead_to_dict(row) for row in rows]
 
 
@@ -73,6 +79,26 @@ def create_lead(payload: LeadIn, db: Session = Depends(get_db)) -> dict:
         data["language"] = detect_language(data["phone"], fallback="ar")
     lead = upsert_lead(db, data)
     logger.info("Lead created id=%s phone=%s", lead.id, lead.phone)
+    return lead_to_dict(lead)
+
+
+@router.post("/leads/trial")
+def create_trial_lead(db: Session = Depends(get_db)) -> dict:
+    """One-click sample client so the founder can test the full loop."""
+    lead = upsert_lead(
+        db,
+        {
+            "name": "أمين الطرابلسي",
+            "phone": "+21620111222",
+            "country": "Tunisia",
+            "product": "portfolio",
+            "profession": "محامي",
+            "language": "ar",
+            "source": "trial",
+            "status": "new",
+            "consent_opt_in": True,
+        },
+    )
     return lead_to_dict(lead)
 
 
@@ -110,29 +136,10 @@ def delete_lead(lead_id: int, db: Session = Depends(get_db)) -> dict[str, bool]:
         db.delete(conv)
     db.query(DemoSite).filter_by(lead_id=lead.id).delete()
     db.query(Subscription).filter_by(lead_id=lead.id).delete()
+    db.query(ChangeRequest).filter_by(lead_id=lead.id).delete()
     db.delete(lead)
     db.commit()
     return {"ok": True}
-
-
-@router.post("/leads/trial")
-def create_trial_lead(db: Session = Depends(get_db)) -> dict:
-    """One-click sample client so the founder can test the full loop."""
-    lead = upsert_lead(
-        db,
-        {
-            "name": "أمين الطرابلسي",
-            "phone": "+21620111222",
-            "country": "Tunisia",
-            "product": "portfolio",
-            "profession": "محامي",
-            "language": "ar",
-            "source": "trial",
-            "status": "new",
-            "consent_opt_in": True,
-        },
-    )
-    return lead_to_dict(lead)
 
 
 @router.get("/leads/{lead_id}/messages")

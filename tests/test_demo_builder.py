@@ -4,6 +4,14 @@ from src.extract import heuristic_extract
 
 def test_slugify_ascii() -> None:
     assert slugify("Sara Ben Ali") == "sara-ben-ali"
+    assert slugify("Sara Ben Ali", 12) == "sara-ben-ali-12"
+
+
+def test_slugify_arabic_is_url_safe() -> None:
+    slug = slugify("أمين الطرابلسي", 7)
+    assert slug.startswith("client-")
+    assert "/" not in slug
+    assert " " not in slug
 
 
 def test_pick_portfolio() -> None:
