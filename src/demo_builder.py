@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import html
 import logging
 import re
 import unicodedata
@@ -16,16 +18,17 @@ TEMPLATE_DIR = ROOT / "templates"
 OUTPUT_DIR = ROOT / "demos_output"
 
 
-def slugify(value: str) -> str:
-    """URL-safe slug from a person or business name."""
+def slugify(value: str, lead_id: int | None = None) -> str:
+    """URL-safe slug. Arabic names do not survive ASCII folding, so hash them."""
     normalized = unicodedata.normalize("NFKD", value or "")
     ascii_text = normalized.encode("ascii", "ignore").decode("ascii")
     slug = re.sub(r"[^a-zA-Z0-9]+", "-", ascii_text).strip("-").lower()
-    if slug:
-        return slug
-    # Arabic names often strip to empty via ASCII ignore — keep a stable hash.
-    compact = re.sub(r"\s+", "-", (value or "").strip())
-    return compact[:40] or "client"
+    if not slug:
+        digest = hashlib.sha256((value or "client").encode("utf-8")).hexdigest()[:10]
+        slug = f"client-{digest}"
+    if lead_id:
+        slug = f"{slug}-{lead_id}"
+    return slug[:80]
 
 
 def pick_template(product: str, business_type: str) -> str:
@@ -52,26 +55,35 @@ def build_demo(lead: dict) -> dict:
     HTML file is enough to trigger the endowment effect locally.
     """
     name = (lead.get("name") or "Client").strip()
-    slug = slugify(name) or f"lead-{lead.get('id') or 'new'}"
+    lead_id = lead.get("id")
+    slug = slugify(name, int(lead_id) if lead_id else None)
     template = pick_template(lead.get("product") or "portfolio", lead.get("business_type") or "")
-    html = _read_template(template)
+    html_page = _read_template(template)
 
     replacements = {
-        "{{NAME}}": name,
-        "{{HEADLINE}}": lead.get("profession") or lead.get("business_type") or "Professional",
-        "{{BUSINESS}}": lead.get("business_type") or lead.get("profession") or "Services",
-        "{{PHONE}}": lead.get("phone") or "",
-        "{{CITY}}": lead.get("country") or "Tunisia",
-        "{{ABOUT}}": lead.get("how_found")
-        or "حضور رقمي واضح يساعد الناس على إيجاد هذا العمل والثقة به.",
-        "{{BRAND}}": settings.brand_name,
+        "{{NAME}}": html.escape(name),
+        "{{HEADLINE}}": html.escape(
+            lead.get("profession") or lead.get("business_type") or "Professional"
+        ),
+        "{{BUSINESS}}": html.escape(
+            lead.get("business_type") or lead.get("profession") or "Services"
+        ),
+        "{{PHONE}}": html.escape(lead.get("phone") or ""),
+        "{{CITY}}": html.escape(lead.get("country") or "Tunisia"),
+        "{{ABOUT}}": html.escape(
+            lead.get("how_found")
+            or "حضور رقمي واضح يساعد الناس على إيجاد هذا العمل والثقة به."
+        ),
+        "{{BRAND}}": html.escape(settings.brand_name),
     }
     for token, value in replacements.items():
-        html = html.replace(token, value)
+        html_page = html_page.replace(token, value)
 
-    dest = OUTPUT_DIR / slug
+    dest = (OUTPUT_DIR / slug).resolve()
+    if not str(dest).startswith(str(OUTPUT_DIR.resolve())):
+        raise ValueError("Invalid demo path")
     dest.mkdir(parents=True, exist_ok=True)
-    (dest / "index.html").write_text(html, encoding="utf-8")
+    (dest / "index.html").write_text(html_page, encoding="utf-8")
     url = f"{settings.demo_base_url.rstrip('/')}/demos/{slug}/"
     logger.info("Wrote demo %s", dest)
     return {"slug": slug, "url": url, "template": template, "path": str(dest)}
